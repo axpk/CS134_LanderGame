@@ -1,0 +1,29 @@
+﻿  ofxAssimpModelLoader.cpp
+  Info: Boost.Config is older than your compiler version - probably nothing bad will happen - but you may wish to look for an update Boost version.  Define BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE to suppress this message.
+C:\of_v0.11.2_vs2017_release\libs\openFrameworks\math\ofMatrix4x4.h(326,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\libs\openFrameworks\math\ofMatrix4x4.h(331,1): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\libs\openFrameworks\math\ofMatrix4x4.h(912,12): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\libs\openFrameworks\math\ofMatrix4x4.h(913,12): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\libs\openFrameworks\math\ofMatrix4x4.h(914,12): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\libs\openFrameworks\math\ofMatrix4x4.h(915,12): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(65,138): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(341,100): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(516,29): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(607,30): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(687,49): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(759,63): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\of_v0.11.2_vs2017_release\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp(981,24): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+     Creating library bin\LanderGame.lib and object bin\LanderGame.exp
+  LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+  LanderGame.vcxproj -> C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\LanderGame.exe
+  
+  	                   2	C:\of_v0.11.2_vs2017_release\libs\fmod\lib\vs\x64\
+  	  *EXTRA File 		 3385856	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\assimp32.dll
+  	  *EXTRA File 		 4161536	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\assimp64.dll
+  	  *EXTRA File 		 6942208	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\FreeImage.dll
+  
+  	                   1	C:\of_v0.11.2_vs2017_release\libs\FreeImage\lib\vs\x64\
+  	  *EXTRA File 		 3385856	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\assimp32.dll
+  	  *EXTRA File 		 4161536	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\assimp64.dll
+  	  *EXTRA File 		 1826304	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\fmod.dll
+  	  *EXTRA File 		 2041856	C:\Users\Alan Park\Documents\CS 134 Project\LanderGame\bin\fmodL.dll

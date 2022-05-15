@@ -1,0 +1,9 @@
+.vs/
+LanderGame.vcxproj
+LanderGame.vcxproj.filters
+bin/FreeImage.dll
+bin/LanderGame.exe
+bin/LanderGame.exp
+bin/LanderGame.lib
+bin/fmod.dll
+bin/fmodL.dll

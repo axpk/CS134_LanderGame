@@ -8,3 +8,4 @@ bin/LanderGame.lib
 bin/fmod.dll
 bin/fmodL.dll
 LanderGame.sln
+obj/

@@ -118,6 +118,7 @@ void ofApp::draw() {
 				ofVec3f max = lander.getSceneMax() + lander.getPosition();
 
 				Box bounds = Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
+				ofNoFill();
 				ofSetColor(ofColor::white);
 				Octree::drawBox(bounds);
 

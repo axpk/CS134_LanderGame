@@ -4,7 +4,7 @@
 //  Kevin M. Smith
 //
 //  Octree Test - startup scene
-// 
+//
 //
 //  Student Name: Alan Park
 //  Date: April 25, 2022
@@ -17,7 +17,7 @@
 //--------------------------------------------------------------
 // setup scene, lighting, state and load geometry
 //
-void ofApp::setup(){
+void ofApp::setup() {
     bWireframe = false;
     bDisplayPoints = false;
     bAltKeyDown = false;
@@ -25,7 +25,8 @@ void ofApp::setup(){
     bLanderLoaded = false;
     bTerrainSelected = true;
 //	ofSetWindowShape(1024, 768);
-    cam.setDistance(10);
+    cam.setDistance(100);
+
     cam.setNearClip(.1);
     cam.setFov(65.5);   // approx equivalent to 28mm in 35mm format
     ofSetVerticalSync(true);
@@ -33,10 +34,15 @@ void ofApp::setup(){
     ofEnableSmoothing();
     ofEnableDepthTest();
 
-    // setup rudimentary lighting 
+    // setup rudimentary lighting
     initLightingAndMaterials();
-    mars.loadModel("geo/PlanetTerrainMesa.obj"); // custom terrain
+    mars.loadModel("geo/PlanetTerrainMesaScaled.obj"); // custom terrain
     mars.setScaleNormalization(false);
+
+    lander.loadModel("geo/lander.obj"); // TODO: replace with custom lander
+    lander.setScaleNormalization(false);
+    lander.setPosition(0, 25, 0);
+    bLanderLoaded = true;
 
     // create sliders for testing
     //
@@ -46,29 +52,27 @@ void ofApp::setup(){
 
     //  Create Octree for testing.
     //
-    
+
     mouseClickID = 0;
-    
+
     uint64_t initialCreateTreeTime = ofGetElapsedTimeMillis();
-    
+
     octree.create(mars.getMesh(0), 20);
-    
+
     uint64_t finalCreateTreeTime = ofGetElapsedTimeMillis();
-    
+
     cout << "Tree Create Time: " << finalCreateTreeTime - initialCreateTreeTime << " ms" << endl;
-    
-    
     cout << "Number of Verts: " << mars.getMesh(0).getNumVertices() << endl;
 
     testBox = Box(Vector3(3, 3, 0), Vector3(5, 5, 2));
 
 }
- 
+
 //--------------------------------------------------------------
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-    
+
 }
 //--------------------------------------------------------------
 void ofApp::draw() {
@@ -133,7 +137,7 @@ void ofApp::draw() {
 
 
 
-    if (bDisplayPoints) {                // display points as an option    
+    if (bDisplayPoints) {                // display points as an option
         glPointSize(3);
         ofSetColor(ofColor::green);
         mars.drawVertices();
@@ -177,7 +181,7 @@ void ofApp::draw() {
 }
 
 
-// 
+//
 // Draw an XYZ axis in RGB at world (0,0,0) for reference.
 //
 void ofApp::drawAxis(ofVec3f location) {
@@ -190,7 +194,7 @@ void ofApp::drawAxis(ofVec3f location) {
     // X Axis
     ofSetColor(ofColor(255, 0, 0));
     ofDrawLine(ofPoint(0, 0, 0), ofPoint(1, 0, 0));
-    
+
 
     // Y Axis
     ofSetColor(ofColor(0, 255, 0));
@@ -281,7 +285,7 @@ void ofApp::togglePointsDisplay() {
 void ofApp::keyReleased(int key) {
 
     switch (key) {
-    
+
     case OF_KEY_ALT:
         cam.disableMouseInput();
         bAltKeyDown = false;
@@ -300,9 +304,8 @@ void ofApp::keyReleased(int key) {
 
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y) {
 
-    
 }
 
 
@@ -381,7 +384,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 
         glm::vec3 mousePos = getMousePointOnPlane(landerPos, cam.getZAxis());
         glm::vec3 delta = mousePos - mouseLastPos;
-    
+
         landerPos += delta;
         lander.setPosition(landerPos.x, landerPos.y, landerPos.z);
         mouseLastPos = mousePos;
@@ -393,7 +396,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 
         colBoxList.clear();
         octree.intersect(bounds, octree.root, colBoxList);
-    
+
 
         /*if (bounds.overlap(testBox)) {
             cout << "overlap" << endl;
@@ -418,29 +421,29 @@ void ofApp::mouseReleased(int x, int y, int button) {
 
 
 // Set the camera to use the selected point as it's new target
-//  
+//
 void ofApp::setCameraTarget() {
 
 }
 
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
+void ofApp::mouseEntered(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
+void ofApp::mouseExited(int x, int y) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h) {
 
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg) {
 
 }
 
@@ -482,7 +485,7 @@ void ofApp::initLightingAndMaterials() {
     glEnable(GL_LIGHT0);
 //	glEnable(GL_LIGHT1);
     glShadeModel(GL_SMOOTH);
-} 
+}
 
 void ofApp::savePicture() {
     ofImage picture;
@@ -542,7 +545,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
         //		lander.setRotation(1, 180, 1, 0, 0);
 
-                // We want to drag and drop a 3D object in space so that the model appears 
+                // We want to drag and drop a 3D object in space so that the model appears
                 // under the mouse pointer where you drop it !
                 //
                 // Our strategy: intersect a plane parallel to the camera plane where the mouse drops the model
@@ -560,7 +563,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
         bool hit = glm::intersectRayPlane(origin, mouseDir, glm::vec3(0, 0, 0), camAxis, distance);
         if (hit) {
-            // find the point of intersection on the plane using the distance 
+            // find the point of intersection on the plane using the distance
             // We use the parameteric line or vector representation of a line to compute
             //
             // p' = p + s * dir;
@@ -583,7 +586,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }
 
-//  intersect the mouse ray with the plane normal to the camera 
+//  intersect the mouse ray with the plane normal to the camera
 //  return intersection point.   (package code above into function)
 //
 glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm) {
@@ -598,7 +601,7 @@ glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm) {
     bool hit = glm::intersectRayPlane(origin, mouseDir, planePt, planeNorm, distance);
 
     if (hit) {
-        // find the point of intersection on the plane using the distance 
+        // find the point of intersection on the plane using the distance
         // We use the parameteric line or vector representation of a line to compute
         //
         // p' = p + s * dir;

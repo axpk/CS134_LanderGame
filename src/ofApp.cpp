@@ -6,8 +6,8 @@
 //  Octree Test - startup scene
 //
 //
-//  Student Name: Alan Park
-//  Date: April 25, 2022
+//  Student Name: Alan Park, Walton Ma
+//  Date date: May 18, 2022
 
 
 #include "ofApp.h"
@@ -39,7 +39,8 @@ void ofApp::setup() {
     mars.loadModel("geo/PlanetTerrainMesaScaled.obj"); // custom terrain
     mars.setScaleNormalization(false);
 
-    lander.loadModel("geo/lander.obj"); // TODO: replace with custom lander
+    //lander.loadModel("geo/lander.obj"); // Placeholder lander model
+    lander.loadModel("geo/red_rocket.obj"); // Custom lander model
     lander.setScaleNormalization(false);
     lander.setPosition(0, 25, 0);
     bLanderLoaded = true;

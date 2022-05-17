@@ -34,10 +34,8 @@ void ofApp::setup(){
 	ofEnableDepthTest();
 
 	// setup rudimentary lighting 
-	//
 	initLightingAndMaterials();
-
-	mars.loadModel("geo/mars-low-5x-v2.obj");
+	mars.loadModel("geo/PlanetTerrainMesa.obj"); // custom terrain
 	mars.setScaleNormalization(false);
 
 	// create sliders for testing

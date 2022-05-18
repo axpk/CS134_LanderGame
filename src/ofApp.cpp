@@ -58,6 +58,7 @@ void ofApp::setup() {
     //
     gui.setup();
     gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
+    
     bHide = false;
 
     //  Create Octree for testing.
@@ -76,17 +77,44 @@ void ofApp::setup() {
 
     testBox = Box(Vector3(3, 3, 0), Vector3(5, 5, 2));
     
+    // Player particle for movement
     gravityForce = new GravityForce(ofVec3f(0, -2.5, 0));
     playerParticleEmitter.sys->addForce(gravityForce);
     turbForce = new TurbulenceForce(ofVec3f(-7, 0, -7), ofVec3f(7, 0, 7));
     playerParticleEmitter.sys->addForce(turbForce);
-    
     playerParticleEmitter.setVelocity(ofVec3f(0, 0, 0));
     playerParticleEmitter.setOneShot(true);
     playerParticleEmitter.setEmitterType(DirectionalEmitter);
     playerParticleEmitter.setPosition(ofVec3f(0, 100, 0));
     playerParticleEmitter.setLifespan(-1);
     playerParticleEmitter.start();
+    
+    fuel = 100.0;
+    altitude = lander.getPosition().y;
+    
+    // Rocket emitter
+    turbForceRocket = new TurbulenceForce(ofVec3f(-1, 0, -1), ofVec3f(1, 0, 1));
+    rocketEmitter.sys->addForce(turbForceRocket);
+    rocketEmitter.setEmitterType(RadialEmitter);
+    rocketEmitter.setVelocity(ofVec3f(0, -100, 0));
+    rocketEmitter.setGroupSize(200);
+    rocketEmitter.setParticleRadius(.3);
+    rocketEmitter.setRate(1);
+    rocketEmitter.setLifespan(0.1);
+    rocketEmitter.setOneShot(true);
+    
+    // Explosion Emitter
+    radialForce = new ImpulseRadialForce(2000.0, 1);
+    explosionEmitter.sys->addForce(radialForce);
+    explosionEmitter.setEmitterType(RadialEmitter);
+    explosionEmitter.useOriginalRadial = true;
+    explosionEmitter.setOneShot(true);
+    explosionEmitter.setVelocity(ofVec3f(0, 0, 0));
+    explosionEmitter.setGroupSize(1000);
+    explosionEmitter.setRate(1);
+    explosionEmitter.setLifespan(0.5);
+    explosionEmitter.setParticleRadius(0.2);
+    
     
     trackCam.lookAt(lander.getPosition());
     landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
@@ -99,46 +127,63 @@ void ofApp::setup() {
 //
 void ofApp::update() {
     playerParticleEmitter.update();
+    rocketEmitter.update();
+    explosionEmitter.update();
     ofVec3f landerParticlePosition = playerParticleEmitter.sys->particles.at(0).position;
+    rocketEmitter.setPosition(landerParticlePosition);
+    explosionEmitter.setPosition(landerParticlePosition);
     lander.setPosition(landerParticlePosition.x, landerParticlePosition.y, landerParticlePosition.z);
+    altitude = lander.getPosition().y; // change altitude to use raycast
     trackCam.lookAt(lander.getPosition());
     landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
     landerCam1.lookAt(glm::vec3(lander.getPosition().x, -lander.getPosition().y, lander.getPosition().z));
-    if (moveLeft) {
-        playerParticleEmitter.sys->particles.at(0).forces.x -= 7;
-    }
-    if (moveRight) {
-        playerParticleEmitter.sys->particles.at(0).forces.x += 7;
-    }
-    if (moveForward) {
-        playerParticleEmitter.sys->particles.at(0).forces.z -= 7;
-    }
-    if (moveBackward) {
-        playerParticleEmitter.sys->particles.at(0).forces.z += 7;
-    }
-    if (thrust) {
-        playerParticleEmitter.sys->particles.at(0).forces.y += 10;
-    }
-    // TODO: rotate model
-    if (rotateLeft) {
+    
+    
+    if (fuel > 0) {
+        
+        if (moveLeft || moveRight || moveForward || moveBackward || thrust || rotateLeft || rotateRight) {
+            fuel -= 0.05;
+        }
+        
+        if (moveLeft) {
+            playerParticleEmitter.sys->particles.at(0).forces.x -= 7;
+        }
+        if (moveRight) {
+            playerParticleEmitter.sys->particles.at(0).forces.x += 7;
+        }
+        if (moveForward) {
+            playerParticleEmitter.sys->particles.at(0).forces.z -= 7;
+        }
+        if (moveBackward) {
+            playerParticleEmitter.sys->particles.at(0).forces.z += 7;
+        }
+        if (thrust) {
+            playerParticleEmitter.sys->particles.at(0).forces.y += 10;
+            rocketEmitter.sys->reset();
+            rocketEmitter.start();
+        } else {
+            rocketEmitter.stop();
+        }
+        // TODO: rotate model
+        if (rotateLeft) {
+            explosionEmitter.sys->reset();
+            explosionEmitter.start(); // debugging for now, will move for collision detection
+        }
+        if (rotateRight) {
+            
+        }
         
     }
-    if (rotateRight) {
-        
-    }
+    
     
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
     ofBackground(ofColor::black);
-
-    glDepthMask(false);
-    if (!bHide) gui.draw();
-    glDepthMask(true);
-
     theCam->begin();
     ofPushMatrix();
+    
     if (bWireframe) {                    // wireframe mode  (include axis)
         ofDisableLighting();
         ofSetColor(ofColor::slateGray);
@@ -230,8 +275,26 @@ void ofApp::draw() {
         ofDrawSphere(p, .02 * d.length());
     }
 
+    rocketEmitter.draw();
+    explosionEmitter.draw();
+    
     ofPopMatrix();
     theCam->end();
+    
+    glDepthMask(false);
+    if (!bHide) gui.draw();
+    ofSetColor(ofColor::white);
+    string fuelText = "Fuel: " + std::to_string(fuel);
+    if (fuel > 0) {
+        ofDrawBitmapString(fuelText, ofGetWindowWidth() - 200, 25);
+    } else {
+        ofDrawBitmapString("Fuel: EMPTY", ofGetWindowWidth() - 200, 25);
+    }
+    if (showAltitude) {
+        string altitudeText = "Altitude: " + std::to_string(altitude);
+        ofDrawBitmapString(altitudeText, ofGetWindowWidth() - 200, 50);
+    }
+    glDepthMask(true);
 }
 
 
@@ -288,6 +351,8 @@ void ofApp::keyPressed(int key) {
             break;
         case 'H':
         case 'h':
+            if (!showAltitude) showAltitude = true;
+            else showAltitude = false;
             break;
         case 'L':
         case 'l':

@@ -44,4 +44,5 @@ public:
     
     void setImpulseHeight(float);
     float impulseHeight;
+    bool useOriginalRadial = false;
 };

@@ -91,6 +91,12 @@ public:
     TurbulenceForce *turbForce;
     ParticleEmitter playerParticleEmitter;
     
+    TurbulenceForce *turbForceRocket;
+    ParticleEmitter rocketEmitter;
+    
+    ImpulseRadialForce *radialForce;
+    ParticleEmitter explosionEmitter;
+    
     bool moveForward;
     bool moveBackward;
     bool moveLeft;
@@ -98,5 +104,10 @@ public:
     bool thrust;
     bool rotateLeft;
     bool rotateRight;
+    
+    float altitude;
+    float fuel;
+    
+    bool showAltitude = true;
     
 };

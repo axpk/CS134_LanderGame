@@ -5,6 +5,8 @@
 #include  "ofxAssimpModelLoader.h"
 #include "Octree.h"
 #include <glm/gtx/intersect.hpp>
+#include "Particle.h"
+#include "ParticleEmitter.h"
 //#include <fstream>
 
 
@@ -38,7 +40,14 @@ public:
     bool raySelectWithOctree(ofVec3f &pointRet);
     glm::vec3 getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 
-    ofEasyCam cam;
+//    ofEasyCam cam;
+    
+    // OpenFramework cameras
+    ofEasyCam easyCam; // General overview
+    ofCamera trackCam; // Tracking camera, constantly on lander
+    ofCamera landerCam1; // Camera on-board lander
+    ofCamera *theCam;
+    
     ofxAssimpModelLoader mars, lander;
     ofLight light;
     Box boundingBox, landerBounds;
@@ -76,4 +85,18 @@ public:
     const float selectionRange = 4.0;
     
     int mouseClickID;
+    
+    // physics based movement using Particle Emitter
+    GravityForce *gravityForce;
+    TurbulenceForce *turbForce;
+    ParticleEmitter playerParticleEmitter;
+    
+    bool moveForward;
+    bool moveBackward;
+    bool moveLeft;
+    bool moveRight;
+    bool thrust;
+    bool rotateLeft;
+    bool rotateRight;
+    
 };

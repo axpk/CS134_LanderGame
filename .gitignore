@@ -9,3 +9,4 @@ bin/fmod.dll
 bin/fmodL.dll
 LanderGame.sln
 obj/
+*.DS_Store

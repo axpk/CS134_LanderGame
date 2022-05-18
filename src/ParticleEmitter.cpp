@@ -53,6 +53,7 @@ void ParticleEmitter::draw() {
 			break;
 		case SphereEmitter:
 		case RadialEmitter:
+            ofSetColor(ofColor::yellow);
 			ofDrawSphere(position, radius/10);  // just draw a small sphere as a placeholder
 			break;
 		default:
@@ -113,8 +114,12 @@ void ParticleEmitter::spawn(float time) {
 	switch (type) {
 	case RadialEmitter:
 	{
-        float yDir = ofRandom(-impulseHeight, impulseHeight);
-		ofVec3f dir = ofVec3f(ofRandom(-1, 1), yDir, ofRandom(-1, 1));
+        ofVec3f dir;
+        if (useOriginalRadial) {
+            dir = ofVec3f(ofRandom(-0.1, 0.1), ofRandom(-0.1, 0.1), ofRandom(-0.1, 0.1));
+        } else {
+            dir = ofVec3f(ofRandom(-0.1, 0.1), -1, ofRandom(-0.1, 0.1));
+        }
 		float speed = velocity.length();
 		particle.velocity = dir.getNormalized() * speed;
 		particle.position.set(position);

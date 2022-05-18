@@ -133,11 +133,11 @@ void ofApp::update() {
             float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;
             playerParticleEmitter.stop();
             
-            if (finalYVelocity < -3) {
+            if (finalYVelocity < -5) {
                 explosionEmitter.sys->reset();
                 explosionEmitter.start(); // debugging for now, will move for collision detection
                 landingType = 0; // crash
-            } else if (finalYVelocity < -1) {
+            } else if (finalYVelocity < -2.5) {
                 landingType = 1; // hard landing
             } else {
                 landingType = 2; // good landing

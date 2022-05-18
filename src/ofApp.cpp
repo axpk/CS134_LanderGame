@@ -24,16 +24,17 @@ void ofApp::setup() {
     bCtrlKeyDown = false;
     bLanderLoaded = false;
     bTerrainSelected = true;
-//	ofSetWindowShape(1024, 768);
     ofSetVerticalSync(true);
     
     theCam = &easyCam;
     easyCam.setDistance(100);
     easyCam.setNearClip(0.1);
     easyCam.setFov(65.5); // approx equivalent to 28mm in 35mm format
+    easyCam.setPosition(0, 300, 200);
+    easyCam.lookAt(glm::vec3(0, 0, 0));
     easyCam.disableMouseInput();
     
-    trackCam.setPosition(glm::vec3(50, 75, 0));
+    trackCam.setPosition(glm::vec3(0, 75, 50));
     trackCam.setNearClip(0.1);
     trackCam.setFov(65.5);
     
@@ -96,11 +97,12 @@ void ofApp::setup() {
     turbForceRocket = new TurbulenceForce(ofVec3f(-1, 0, -1), ofVec3f(1, 0, 1));
     rocketEmitter.sys->addForce(turbForceRocket);
     rocketEmitter.setEmitterType(RadialEmitter);
+    rocketEmitter.useOriginalRadial = false;
     rocketEmitter.setVelocity(ofVec3f(0, -100, 0));
     rocketEmitter.setGroupSize(200);
     rocketEmitter.setParticleRadius(.3);
     rocketEmitter.setRate(1);
-    rocketEmitter.setLifespan(0.1);
+    rocketEmitter.setLifespan(0.3);
     rocketEmitter.setOneShot(true);
     
     // Explosion Emitter
@@ -126,18 +128,46 @@ void ofApp::setup() {
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-    playerParticleEmitter.update();
+    if (altitude <= 0) {
+        if (!completedLandingSequence) {
+            float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;
+            playerParticleEmitter.stop();
+            
+            if (finalYVelocity < -3) {
+                explosionEmitter.sys->reset();
+                explosionEmitter.start(); // debugging for now, will move for collision detection
+                landingType = 0; // crash
+            } else if (finalYVelocity < -1) {
+                landingType = 1; // hard landing
+            } else {
+                landingType = 2; // good landing
+            }
+            completedLandingSequence = true;
+        }
+    } else {
+        playerParticleEmitter.update();
+    }
+    
     rocketEmitter.update();
     explosionEmitter.update();
     ofVec3f landerParticlePosition = playerParticleEmitter.sys->particles.at(0).position;
     rocketEmitter.setPosition(landerParticlePosition);
     explosionEmitter.setPosition(landerParticlePosition);
     lander.setPosition(landerParticlePosition.x, landerParticlePosition.y, landerParticlePosition.z);
-    altitude = lander.getPosition().y; // change altitude to use raycast
     trackCam.lookAt(lander.getPosition());
     landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
     landerCam1.lookAt(glm::vec3(lander.getPosition().x, -lander.getPosition().y, lander.getPosition().z));
     
+    if (camOnLander) {
+        easyCam.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z + 50);
+        easyCam.lookAt(lander.getPosition());
+    }
+    
+    // TODO: check altitude with raycast
+
+    ofVec3f pt;
+    raySelectWithOctreeLander(pt);
+    altitude = lander.getPosition().y - 5.4 - pt.y; // 5.4 for model height
     
     if (fuel > 0) {
         
@@ -166,8 +196,7 @@ void ofApp::update() {
         }
         // TODO: rotate model
         if (rotateLeft) {
-            explosionEmitter.sys->reset();
-            explosionEmitter.start(); // debugging for now, will move for collision detection
+            
         }
         if (rotateRight) {
             
@@ -268,12 +297,12 @@ void ofApp::draw() {
 
     // if point selected, draw a sphere
     //
-    if (pointSelected) {
-        ofVec3f p = octree.mesh.getVertex(selectedNode.points[0]);
-        ofVec3f d = p - easyCam.getPosition();
-        ofSetColor(ofColor::lightGreen);
-        ofDrawSphere(p, .02 * d.length());
-    }
+//    if (pointSelected) {
+//        ofVec3f p = octree.mesh.getVertex(selectedNode.points[0]);
+//        ofVec3f d = p - easyCam.getPosition();
+//        ofSetColor(ofColor::lightGreen);
+//        ofDrawSphere(p, .02 * d.length());
+//    }
 
     rocketEmitter.draw();
     explosionEmitter.draw();
@@ -291,8 +320,18 @@ void ofApp::draw() {
         ofDrawBitmapString("Fuel: EMPTY", ofGetWindowWidth() - 200, 25);
     }
     if (showAltitude) {
-        string altitudeText = "Altitude: " + std::to_string(altitude);
-        ofDrawBitmapString(altitudeText, ofGetWindowWidth() - 200, 50);
+        if (completedLandingSequence) {
+            if (landingType == 0) {
+                ofDrawBitmapString("Altitude: CRASHED", ofGetWindowWidth() - 200, 50);
+            } else if (landingType == 1) {
+                ofDrawBitmapString("Altitude: HARD LANDING", ofGetWindowWidth() - 200, 50);
+            } else if (landingType == 2) {
+                ofDrawBitmapString("Altitude: GOOD LAND!", ofGetWindowWidth() - 200, 50);
+            }
+        } else {
+            string altitudeText = "Altitude: " + std::to_string(altitude);
+            ofDrawBitmapString(altitudeText, ofGetWindowWidth() - 200, 50);
+        }
     }
     glDepthMask(true);
 }
@@ -332,8 +371,11 @@ void ofApp::keyPressed(int key) {
                 ofVec3f p = octree.mesh.getVertex(selectedNode.points[0]);
                 easyCam.lookAt(p);
             }
+            camOnLander = false;
             break;
         case '2':
+            if (!camOnLander) camOnLander = true;
+            else camOnLander = false;
             easyCam.lookAt(lander.getPosition());
             break;
         case 'B':
@@ -529,6 +571,21 @@ bool ofApp::raySelectWithOctree(ofVec3f &pointRet) {
     ofVec3f rayDir = rayPoint - easyCam.getPosition();
     rayDir.normalize();
     Ray ray = Ray(Vector3(rayPoint.x, rayPoint.y, rayPoint.z),
+        Vector3(rayDir.x, rayDir.y, rayDir.z));
+
+    pointSelected = octree.intersect(ray, octree.root, selectedNode);
+
+    if (pointSelected) {
+        pointRet = octree.mesh.getVertex(selectedNode.points[0]);
+    }
+    return pointSelected;
+}
+
+bool ofApp::raySelectWithOctreeLander(ofVec3f &pointRet) {
+    ofVec3f landerOrig = ofVec3f(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
+    ofVec3f rayDir = ofVec3f(0, -1, 0);
+    rayDir.normalize();
+    Ray ray = Ray(Vector3(landerOrig.x, landerOrig.y, landerOrig.z),
         Vector3(rayDir.x, rayDir.y, rayDir.z));
 
     pointSelected = octree.intersect(ray, octree.root, selectedNode);

@@ -7,6 +7,7 @@
 #include <glm/gtx/intersect.hpp>
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include "ray.h"
 //#include <fstream>
 
 
@@ -38,6 +39,7 @@ public:
     void setCameraTarget();
     bool mouseIntersectPlane(ofVec3f planePoint, ofVec3f planeNorm, ofVec3f &point);
     bool raySelectWithOctree(ofVec3f &pointRet);
+    bool raySelectWithOctreeLander(ofVec3f &pointRet);
     glm::vec3 getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 
 //    ofEasyCam cam;
@@ -109,5 +111,7 @@ public:
     float fuel;
     
     bool showAltitude = true;
-    
+    bool camOnLander = true;
+    bool completedLandingSequence = false;
+    int landingType = -1;
 };

@@ -165,7 +165,7 @@ void ofApp::setup() {
     playerParticleEmitter.setEmitterType(DirectionalEmitter);
     playerParticleEmitter.setPosition(ofVec3f(0, 100, 0));
     playerParticleEmitter.setLifespan(-1);
-    playerParticleEmitter.start();
+    //playerParticleEmitter.start();
     
     fuel = 100.0;
     altitude = lander.getPosition().y;
@@ -205,80 +205,95 @@ void ofApp::setup() {
 // incrementally update scene (animation)
 //
 void ofApp::update() {
-    if (altitude <= 0) {
-        if (!completedLandingSequence) {
-            float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;
-            playerParticleEmitter.stop();
-            
-            if (finalYVelocity < -5) {
-                explosionEmitter.sys->reset();
-                explosionEmitter.start(); // debugging for now, will move for collision detection
-                landingType = 0; // crash
-            } else if (finalYVelocity < -2.5) {
-                landingType = 1; // hard landing
-            } else {
-                landingType = 2; // good landing
-            }
-            completedLandingSequence = true;
-        }
-    } else {
-        playerParticleEmitter.update();
-    }
-    
-    rocketEmitter.update();
-    explosionEmitter.update();
-    ofVec3f landerParticlePosition = playerParticleEmitter.sys->particles.at(0).position;
-    rocketEmitter.setPosition(landerParticlePosition);
-    explosionEmitter.setPosition(landerParticlePosition);
-    lander.setPosition(landerParticlePosition.x, landerParticlePosition.y, landerParticlePosition.z);
-    trackCam.lookAt(lander.getPosition());
-    landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
-    landerCam1.lookAt(glm::vec3(lander.getPosition().x, -lander.getPosition().y, lander.getPosition().z));
-    
-    if (camOnLander) {
-        easyCam.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z + 50);
-        easyCam.lookAt(lander.getPosition());
-    }
-    
-    // TODO: check altitude with raycast
+    playerParticleEmitter.setPosition(ofVec3f(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z));
 
-    ofVec3f pt;
-    raySelectWithOctreeLander(pt);
-    altitude = lander.getPosition().y - 5.4 - pt.y; // 5.4 for model height
-    
-    if (fuel > 0) {
-        
-        if (moveLeft || moveRight || moveForward || moveBackward || thrust || rotateLeft || rotateRight) {
-            fuel -= 0.05;
+    if (bGameStart)
+    {
+        if (!playEmitterStarted)
+        {
+            playerParticleEmitter.start();
+            playEmitterStarted = true;
         }
-        
-        if (moveLeft) {
-            playerParticleEmitter.sys->particles.at(0).forces.x -= 7;
+
+        if (altitude <= 0) {
+            if (!completedLandingSequence) {
+                float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;
+                playerParticleEmitter.stop();
+
+                if (finalYVelocity < -5) {
+                    explosionEmitter.sys->reset();
+                    explosionEmitter.start(); // debugging for now, will move for collision detection
+                    landingType = 0; // crash
+                }
+                else if (finalYVelocity < -2.5) {
+                    landingType = 1; // hard landing
+                }
+                else {
+                    landingType = 2; // good landing
+                }
+                completedLandingSequence = true;
+            }
         }
-        if (moveRight) {
-            playerParticleEmitter.sys->particles.at(0).forces.x += 7;
+        else {
+            playerParticleEmitter.update();
         }
-        if (moveForward) {
-            playerParticleEmitter.sys->particles.at(0).forces.z -= 7;
+
+        rocketEmitter.update();
+        explosionEmitter.update();
+        ofVec3f landerParticlePosition = playerParticleEmitter.sys->particles.at(0).position;
+        rocketEmitter.setPosition(landerParticlePosition);
+        explosionEmitter.setPosition(landerParticlePosition);
+        lander.setPosition(landerParticlePosition.x, landerParticlePosition.y, landerParticlePosition.z);
+        trackCam.lookAt(lander.getPosition());
+        landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
+        landerCam1.lookAt(glm::vec3(lander.getPosition().x, -lander.getPosition().y, lander.getPosition().z));
+
+        if (camOnLander) {
+            easyCam.setPosition(lander.getPosition().x, lander.getPosition().y + 50, lander.getPosition().z + 50);
+            easyCam.lookAt(lander.getPosition());
         }
-        if (moveBackward) {
-            playerParticleEmitter.sys->particles.at(0).forces.z += 7;
+
+        // TODO: check altitude with raycast
+
+        ofVec3f pt;
+        raySelectWithOctreeLander(pt);
+        altitude = lander.getPosition().y - 5.4 - pt.y; // 5.4 for model height
+
+        if (fuel > 0) {
+
+            if (moveLeft || moveRight || moveForward || moveBackward || thrust || rotateLeft || rotateRight) {
+                fuel -= 0.05;
+            }
+
+            if (moveLeft) {
+                playerParticleEmitter.sys->particles.at(0).forces.x -= 7;
+            }
+            if (moveRight) {
+                playerParticleEmitter.sys->particles.at(0).forces.x += 7;
+            }
+            if (moveForward) {
+                playerParticleEmitter.sys->particles.at(0).forces.z -= 7;
+            }
+            if (moveBackward) {
+                playerParticleEmitter.sys->particles.at(0).forces.z += 7;
+            }
+            if (thrust) {
+                playerParticleEmitter.sys->particles.at(0).forces.y += 10;
+                rocketEmitter.sys->reset();
+                rocketEmitter.start();
+            }
+            else {
+                rocketEmitter.stop();
+            }
+            // TODO: rotate model
+            if (rotateLeft) {
+
+            }
+            if (rotateRight) {
+
+            }
+
         }
-        if (thrust) {
-            playerParticleEmitter.sys->particles.at(0).forces.y += 10;
-            rocketEmitter.sys->reset();
-            rocketEmitter.start();
-        } else {
-            rocketEmitter.stop();
-        }
-        // TODO: rotate model
-        if (rotateLeft) {
-            
-        }
-        if (rotateRight) {
-            
-        }
-        
     }
     
     // Adjust lander light so it sticks with lander
@@ -389,46 +404,52 @@ void ofApp::draw() {
 //        ofDrawSphere(p, .02 * d.length());
 //    }
 
-    rocketEmitter.draw();
-    explosionEmitter.draw();
-
-    // Purely for debugging, please comment out or delete
-    ofSetColor(ofColor::white);
-    ofNoFill();
-    //ambientLight.draw();
-    //landerLight1.draw();
-    //landerLight2.draw();
-    //landingLight1.draw();
-    //landingLight2.draw();
-    //landingLight3.draw();
+    if (bGameStart)
+    {
+        rocketEmitter.draw();
+        explosionEmitter.draw();
+    }
     
     ofPopMatrix();
-
     theCam->end();
     
     glDepthMask(false);
     if (!bHide) gui.draw();
-    ofSetColor(ofColor::white);
-    string fuelText = "Fuel: " + std::to_string(fuel);
-    if (fuel > 0) {
-        ofDrawBitmapString(fuelText, ofGetWindowWidth() - 200, 25);
-    } else {
-        ofDrawBitmapString("Fuel: EMPTY", ofGetWindowWidth() - 200, 25);
+
+    if (!bGameStart)
+    {
+        ofSetColor(ofColor::green);
+        ofDrawBitmapString("Press 'ENTER' to start simulation", (ofGetWindowWidth() / 2) - 130, 25);
     }
-    if (showAltitude) {
-        if (completedLandingSequence) {
-            if (landingType == 0) {
-                ofDrawBitmapString("Altitude: CRASHED", ofGetWindowWidth() - 200, 50);
-            } else if (landingType == 1) {
-                ofDrawBitmapString("Altitude: HARD LANDING", ofGetWindowWidth() - 200, 50);
-            } else if (landingType == 2) {
-                ofDrawBitmapString("Altitude: GOOD LAND!", ofGetWindowWidth() - 200, 50);
+    if (bGameStart)
+    {
+        ofSetColor(ofColor::white);
+        string fuelText = "Fuel: " + std::to_string(fuel);
+        if (fuel > 0) {
+            ofDrawBitmapString(fuelText, ofGetWindowWidth() - 200, 25);
+        }
+        else {
+            ofDrawBitmapString("Fuel: EMPTY", ofGetWindowWidth() - 200, 25);
+        }
+        if (showAltitude) {
+            if (completedLandingSequence) {
+                if (landingType == 0) {
+                    ofDrawBitmapString("Altitude: CRASHED", ofGetWindowWidth() - 200, 50);
+                }
+                else if (landingType == 1) {
+                    ofDrawBitmapString("Altitude: HARD LANDING", ofGetWindowWidth() - 200, 50);
+                }
+                else if (landingType == 2) {
+                    ofDrawBitmapString("Altitude: GOOD LAND!", ofGetWindowWidth() - 200, 50);
+                }
             }
-        } else {
-            string altitudeText = "Altitude: " + std::to_string(altitude);
-            ofDrawBitmapString(altitudeText, ofGetWindowWidth() - 200, 50);
+            else {
+                string altitudeText = "Altitude: " + std::to_string(altitude);
+                ofDrawBitmapString(altitudeText, ofGetWindowWidth() - 200, 50);
+            }
         }
     }
+
     glDepthMask(true);
 }
 
@@ -537,6 +558,10 @@ void ofApp::keyPressed(int key) {
         case OF_KEY_DEL:
             break;
                 
+        case OF_KEY_RETURN:
+            bGameStart = true;
+            break;
+
         case OF_KEY_LEFT:
             moveLeft = true;
             break;
@@ -558,6 +583,7 @@ void ofApp::keyPressed(int key) {
         case 'x':
             rotateRight = true;
             break;
+
         case OF_KEY_F1:
             theCam = &easyCam;
             break;

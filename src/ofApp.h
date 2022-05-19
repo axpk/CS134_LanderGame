@@ -82,6 +82,7 @@ public:
     bool bDisplayLeafNodes = false;
     bool bDisplayOctree = false;
     bool bDisplayBBoxes = false;
+    bool bGameStart = false;
     
     bool bLanderLoaded;
     bool bTerrainSelected;
@@ -120,5 +121,6 @@ public:
     bool showAltitude = true;
     bool camOnLander = true;
     bool completedLandingSequence = false;
+    bool playEmitterStarted = false;
     int landingType = -1;
 };

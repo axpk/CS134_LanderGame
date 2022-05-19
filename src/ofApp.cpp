@@ -165,7 +165,7 @@ void ofApp::setup() {
     playerParticleEmitter.setEmitterType(DirectionalEmitter);
     playerParticleEmitter.setPosition(ofVec3f(0, 100, 0));
     playerParticleEmitter.setLifespan(-1);
-    playerParticleEmitter.start();
+    //playerParticleEmitter.start();
     
     fuel = 100.0;
     altitude = lander.getPosition().y;
@@ -207,6 +207,12 @@ void ofApp::setup() {
 void ofApp::update() {
     if (bGameStart)
     {
+        if (!playEmitterStarted)
+        {
+            playerParticleEmitter.start();
+            playEmitterStarted = true;
+        }
+
         if (altitude <= 0) {
             if (!completedLandingSequence) {
                 float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;

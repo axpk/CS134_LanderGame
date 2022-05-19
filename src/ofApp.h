@@ -121,5 +121,6 @@ public:
     bool showAltitude = true;
     bool camOnLander = true;
     bool completedLandingSequence = false;
+    bool playEmitterStarted = false;
     int landingType = -1;
 };

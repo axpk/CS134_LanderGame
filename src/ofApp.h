@@ -49,6 +49,13 @@ public:
     ofCamera trackCam; // Tracking camera, constantly on lander
     ofCamera landerCam1; // Camera on-board lander
     ofCamera *theCam;
+
+    ofImage background;
+
+    // OpenFramework lights
+    ofLight ambientLight;   // Ambient lighting, ensure entire scene isn't pitch black
+    ofLight landerLight1, landerLight2;    // Light to illuminate lander.  Currently is an area light, unsure if should be spotlight or not
+    ofLight landingLight1, landingLight2, landingLight3;    // Area lights to mark landing spots
     
     ofxAssimpModelLoader mars, lander;
     ofLight light;

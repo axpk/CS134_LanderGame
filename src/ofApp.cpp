@@ -26,6 +26,8 @@ void ofApp::setup() {
     bTerrainSelected = true;
     ofSetVerticalSync(true);
     
+    background.load("images/background.png");
+
     theCam = &easyCam;
     easyCam.setDistance(100);
     easyCam.setNearClip(0.1);
@@ -34,7 +36,8 @@ void ofApp::setup() {
     easyCam.lookAt(glm::vec3(0, 0, 0));
     easyCam.disableMouseInput();
     
-    trackCam.setPosition(glm::vec3(0, 75, 50));
+    //trackCam.setPosition(glm::vec3(0, 75, 50));
+    trackCam.setPosition(glm::vec3(0, 51, 50)); // Set at lower position so its easier to see how close rocket is to ground
     trackCam.setNearClip(0.1);
     trackCam.setFov(65.5);
     
@@ -44,8 +47,77 @@ void ofApp::setup() {
     ofEnableSmoothing();
     ofEnableDepthTest();
 
-    // setup rudimentary lighting
+    // setup rudimentary & actual lighting
     initLightingAndMaterials();
+
+    float ambLightVal = 0.4;
+    ambientLight.setup();
+    ambientLight.enable();
+    ambientLight.setAreaLight(50, 50);
+    //ambientLight.setPointLight();
+    ambientLight.setAmbientColor(ofFloatColor(ambLightVal * 0.1, ambLightVal * 0.1, ambLightVal * 0.1));
+    ambientLight.setDiffuseColor(ofFloatColor(ambLightVal, ambLightVal, ambLightVal));
+    ambientLight.setSpecularColor(ofFloatColor(ambLightVal, ambLightVal, ambLightVal));
+    //ambientLight.rotate(-90, ofVec3f(0, 1, 0));
+    ambientLight.setPosition(0, 135, 0);
+
+    float landerLight1Val = 1;
+    landerLight1.setup();
+    landerLight1.enable();
+    landerLight1.setSpotlight();
+    landerLight1.setScale(.05);
+    landerLight1.setSpotlightCutOff(25);
+    landerLight1.setAttenuation(3, .01, .01);
+    //landerLight1.setAreaLight(1, 1);
+    landerLight1.setAmbientColor(ofFloatColor(landerLight1Val * 0.5, landerLight1Val * 0.5, landerLight1Val * 0.5));
+    landerLight1.setDiffuseColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
+    landerLight1.setSpecularColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
+    landerLight1.rotate(-90, ofVec3f(1, 0, 0));
+    landerLight1.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
+    //landerLight1.setPosition(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
+
+    //float landerLight2Val = 1;
+    //landerLight2.setup();
+    //landerLight2.enable();
+    //landerLight2.setSpotlight();
+    //landerLight2.setScale(.05);
+    //landerLight2.setSpotlightCutOff(40);
+    //landerLight2.setAttenuation(3, .01, .01);
+    ////landerLight2.setAreaLight(1, 1);
+    //landerLight2.setAmbientColor(ofFloatColor(landerLight1Val * 0.5, landerLight1Val * 0.5, landerLight1Val * 0.5));
+    //landerLight2.setDiffuseColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
+    //landerLight2.setSpecularColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
+    //landerLight2.rotate(90, ofVec3f(1, 0, 0));
+    //landerLight2.setPosition(lander.getPosition().x, lander.getPosition().y - 8, lander.getPosition().z);
+    ////landerLight2.setPosition(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
+
+    float landLightVal = 0.6;
+    landingLight1.setup();
+    landingLight1.enable();
+    landingLight1.setAreaLight(10, 3);
+    landingLight1.setAmbientColor(ofFloatColor(landLightVal * 0.1, landLightVal * 0.1, landLightVal * 0.1));
+    landingLight1.setDiffuseColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
+    landingLight1.setSpecularColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
+    landingLight1.setPosition(-45, 52, -40);
+
+    landingLight2.setup();
+    landingLight2.enable();
+    landingLight2.setAreaLight(10, 3);
+    landingLight2.setAmbientColor(ofFloatColor(landLightVal * 0.1, landLightVal * 0.1, landLightVal * 0.1));
+    landingLight2.setDiffuseColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
+    landingLight2.setSpecularColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
+    landingLight2.setPosition(23, 52, 63);
+
+    landingLight3.setup();
+    landingLight3.enable();
+    landingLight3.setAreaLight(10, 3);
+    landingLight3.setAmbientColor(ofFloatColor(landLightVal * 0.1, landLightVal * 0.1, landLightVal * 0.1));
+    landingLight3.setDiffuseColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
+    landingLight3.setSpecularColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
+    landingLight3.setPosition(83, 48, -76);
+
+
+    //  Setup terrain and lander models
     mars.loadModel("geo/PlanetTerrainMesaFinal.obj"); // custom terrain
     mars.setScaleNormalization(false);
 
@@ -204,13 +276,22 @@ void ofApp::update() {
         
     }
     
-    
+    // Adjust lander light(s) so it sticks with lander
+    landerLight1.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
+    //landerLight2.setPosition(lander.getPosition().x, lander.getPosition().y - 8, lander.getPosition().z);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
     ofBackground(ofColor::black);
+
+    glDepthMask(false);
+    ofSetColor(ofColor::white);
+    background.draw(0, 0, ofGetWindowWidth(), ofGetWindowHeight()); // Unsure if should use width & height of window or actual image
+    glDepthMask(true);
+
     theCam->begin();
+
     ofPushMatrix();
     
     if (bWireframe) {                    // wireframe mode  (include axis)
@@ -306,8 +387,19 @@ void ofApp::draw() {
 
     rocketEmitter.draw();
     explosionEmitter.draw();
+
+    // Purely for debugging, please comment out or delete
+    ofSetColor(ofColor::white);
+    ofNoFill();
+    //ambientLight.draw();
+    //landerLight1.draw();
+    //landerLight2.draw();
+    /*landingLight1.draw();
+    landingLight2.draw();
+    landingLight3.draw();*/
     
     ofPopMatrix();
+
     theCam->end();
     
     glDepthMask(false);
@@ -367,10 +459,16 @@ void ofApp::drawAxis(ofVec3f location) {
 void ofApp::keyPressed(int key) {
     switch (key) {
         case '1':
-            if (pointSelected) {
+            /*if (pointSelected) {
                 ofVec3f p = octree.mesh.getVertex(selectedNode.points[0]);
                 easyCam.lookAt(p);
+            }*/
+
+            if (bPointSelected)
+            {
+                easyCam.lookAt(selectedPoint);
             }
+
             camOnLander = false;
             break;
         case '2':

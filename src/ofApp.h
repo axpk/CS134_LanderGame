@@ -82,6 +82,7 @@ public:
     bool bDisplayLeafNodes = false;
     bool bDisplayOctree = false;
     bool bDisplayBBoxes = false;
+    bool bGameStart = false;
     
     bool bLanderLoaded;
     bool bTerrainSelected;

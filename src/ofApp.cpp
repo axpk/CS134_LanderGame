@@ -205,6 +205,8 @@ void ofApp::setup() {
 // incrementally update scene (animation)
 //
 void ofApp::update() {
+    playerParticleEmitter.setPosition(ofVec3f(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z));
+
     if (bGameStart)
     {
         if (!playEmitterStarted)

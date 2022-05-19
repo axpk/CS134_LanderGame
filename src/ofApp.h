@@ -53,9 +53,9 @@ public:
     ofImage background;
 
     // OpenFramework lights
-    ofLight ambientLight;   // Ambient lighting, ensure entire scene isn't pitch black
-    ofLight landerLight1, landerLight2;    // Light to illuminate lander.  Currently is an area light, unsure if should be spotlight or not
-    ofLight landingLight1, landingLight2, landingLight3;    // Area lights to mark landing spots
+    ofLight ambientLight1, ambientLight2;   // Ambient lighting, ensure entire scene isn't pitch black
+    ofLight landerLight;    // Light to illuminate lander.
+    ofLight landingLight1, landingLight2, landingLight3;    // Lights to mark landing spots
     
     ofxAssimpModelLoader mars, lander;
     ofLight light;

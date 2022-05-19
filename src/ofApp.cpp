@@ -50,71 +50,76 @@ void ofApp::setup() {
     // setup rudimentary & actual lighting
     initLightingAndMaterials();
 
-    float ambLightVal = 0.4;
-    ambientLight.setup();
-    ambientLight.enable();
-    ambientLight.setAreaLight(50, 50);
-    //ambientLight.setPointLight();
-    ambientLight.setAmbientColor(ofFloatColor(ambLightVal * 0.1, ambLightVal * 0.1, ambLightVal * 0.1));
-    ambientLight.setDiffuseColor(ofFloatColor(ambLightVal, ambLightVal, ambLightVal));
-    ambientLight.setSpecularColor(ofFloatColor(ambLightVal, ambLightVal, ambLightVal));
-    //ambientLight.rotate(-90, ofVec3f(0, 1, 0));
-    ambientLight.setPosition(0, 135, 0);
+    float ambLightVal = 0.6;
+    ambientLight1.setup();
+    ambientLight1.enable();
+    ambientLight1.setAreaLight(100, 100);
+    ambientLight1.setAmbientColor(ofFloatColor(ambLightVal * 0.1, ambLightVal * 0.1, ambLightVal * 0.1));
+    ambientLight1.setDiffuseColor(ofFloatColor(ambLightVal, ambLightVal, ambLightVal));
+    ambientLight1.setSpecularColor(ofFloatColor(ambLightVal, ambLightVal, ambLightVal));
+    ambientLight1.setPosition(0, 135, 0);
 
-    float landerLight1Val = 1;
-    landerLight1.setup();
-    landerLight1.enable();
-    landerLight1.setSpotlight();
-    landerLight1.setScale(.05);
-    landerLight1.setSpotlightCutOff(25);
-    landerLight1.setAttenuation(3, .01, .01);
-    //landerLight1.setAreaLight(1, 1);
-    landerLight1.setAmbientColor(ofFloatColor(landerLight1Val * 0.5, landerLight1Val * 0.5, landerLight1Val * 0.5));
-    landerLight1.setDiffuseColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
-    landerLight1.setSpecularColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
-    landerLight1.rotate(-90, ofVec3f(1, 0, 0));
-    landerLight1.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
-    //landerLight1.setPosition(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
+    float ambLightVa2 = 0.3;
+    ambientLight2.setup();
+    ambientLight2.enable();
+    ambientLight2.setAreaLight(100, 100);
+    ambientLight2.setAmbientColor(ofFloatColor(ambLightVa2 * 0.1, ambLightVa2 * 0.1, ambLightVa2 * 0.1));
+    ambientLight2.setDiffuseColor(ofFloatColor(ambLightVa2, ambLightVa2, ambLightVa2));
+    ambientLight2.setSpecularColor(ofFloatColor(ambLightVa2, ambLightVa2, ambLightVa2));
+    ambientLight2.setPosition(0, 54, 0);
 
-    //float landerLight2Val = 1;
-    //landerLight2.setup();
-    //landerLight2.enable();
-    //landerLight2.setSpotlight();
-    //landerLight2.setScale(.05);
-    //landerLight2.setSpotlightCutOff(40);
-    //landerLight2.setAttenuation(3, .01, .01);
-    ////landerLight2.setAreaLight(1, 1);
-    //landerLight2.setAmbientColor(ofFloatColor(landerLight1Val * 0.5, landerLight1Val * 0.5, landerLight1Val * 0.5));
-    //landerLight2.setDiffuseColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
-    //landerLight2.setSpecularColor(ofFloatColor(landerLight1Val, landerLight1Val, landerLight1Val));
-    //landerLight2.rotate(90, ofVec3f(1, 0, 0));
-    //landerLight2.setPosition(lander.getPosition().x, lander.getPosition().y - 8, lander.getPosition().z);
-    ////landerLight2.setPosition(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z);
+    float landerLightVal = 1;
+    landerLight.setup();
+    landerLight.enable();
+    landerLight.setSpotlight();
+    landerLight.setScale(.05);
+    landerLight.setSpotlightCutOff(15);
+    landerLight.setAttenuation(2, .01, .01);
+    landerLight.setAmbientColor(ofFloatColor(landerLightVal * 0.5, landerLightVal * 0.5, landerLightVal * 0.5));
+    landerLight.setDiffuseColor(ofFloatColor(landerLightVal, landerLightVal, landerLightVal));
+    landerLight.setSpecularColor(ofFloatColor(landerLightVal, landerLightVal, landerLightVal));
+    landerLight.rotate(-90, ofVec3f(1, 0, 0));
+    landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
 
-    float landLightVal = 0.6;
+    float landLightVal = 1;
     landingLight1.setup();
     landingLight1.enable();
-    landingLight1.setAreaLight(10, 3);
-    landingLight1.setAmbientColor(ofFloatColor(landLightVal * 0.1, landLightVal * 0.1, landLightVal * 0.1));
-    landingLight1.setDiffuseColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
-    landingLight1.setSpecularColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
-    landingLight1.setPosition(-45, 52, -40);
+    landingLight1.setSpotlight();
+    landingLight1.setScale(.05);
+    landingLight1.setSpotlightCutOff(45);
+    landingLight1.setAttenuation(1, .01, .01);
+    landingLight1.setAmbientColor(ofFloatColor(0, landLightVal * 0.1, 0));
+    landingLight1.setDiffuseColor(ofFloatColor(0, landLightVal, 0));
+    landingLight1.setSpecularColor(ofFloatColor(0, landLightVal, 0));
+    landingLight1.rotate(-90, ofVec3f(1, 0, 0));
+    //landingLight1.setPosition(-45, 52, -40);
+    landingLight1.setPosition(-45, 58, -40);
 
     landingLight2.setup();
     landingLight2.enable();
-    landingLight2.setAreaLight(10, 3);
-    landingLight2.setAmbientColor(ofFloatColor(landLightVal * 0.1, landLightVal * 0.1, landLightVal * 0.1));
-    landingLight2.setDiffuseColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
-    landingLight2.setSpecularColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
-    landingLight2.setPosition(23, 52, 63);
+    landingLight2.setSpotlight();
+    landingLight2.setScale(.05);
+    landingLight2.setSpotlightCutOff(45);
+    landingLight2.setAttenuation(1, .01, .01);
+    landingLight2.setAmbientColor(ofFloatColor(0, landLightVal * 0.1, 0));
+    landingLight2.setDiffuseColor(ofFloatColor(0, landLightVal, 0));
+    landingLight2.setSpecularColor(ofFloatColor(0, landLightVal, 0));
+    landingLight2.rotate(-90, ofVec3f(1, 0, 0));
+    //landingLight2.setPosition(23, 52, 63);
+    landingLight2.setPosition(23, 58, 63);
 
     landingLight3.setup();
     landingLight3.enable();
-    landingLight3.setAreaLight(10, 3);
-    landingLight3.setAmbientColor(ofFloatColor(landLightVal * 0.1, landLightVal * 0.1, landLightVal * 0.1));
-    landingLight3.setDiffuseColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
-    landingLight3.setSpecularColor(ofFloatColor(landLightVal, landLightVal, landLightVal));
-    landingLight3.setPosition(83, 48, -76);
+    landingLight3.setSpotlight();
+    landingLight3.setScale(.05);
+    landingLight3.setSpotlightCutOff(45);
+    landingLight3.setAttenuation(1, .01, .01);
+    landingLight3.setAmbientColor(ofFloatColor(0, landLightVal * 0.1, 0));
+    landingLight3.setDiffuseColor(ofFloatColor(0, landLightVal, 0));
+    landingLight3.setSpecularColor(ofFloatColor(0, landLightVal, 0));
+    landingLight3.rotate(-90, ofVec3f(1, 0, 0));
+    //landingLight3.setPosition(83, 48, -76);
+    landingLight3.setPosition(83, 54, -76);
 
 
     //  Setup terrain and lander models
@@ -276,9 +281,8 @@ void ofApp::update() {
         
     }
     
-    // Adjust lander light(s) so it sticks with lander
-    landerLight1.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
-    //landerLight2.setPosition(lander.getPosition().x, lander.getPosition().y - 8, lander.getPosition().z);
+    // Adjust lander light so it sticks with lander
+    landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
 }
 
 //--------------------------------------------------------------
@@ -394,9 +398,9 @@ void ofApp::draw() {
     //ambientLight.draw();
     //landerLight1.draw();
     //landerLight2.draw();
-    /*landingLight1.draw();
-    landingLight2.draw();
-    landingLight3.draw();*/
+    //landingLight1.draw();
+    //landingLight2.draw();
+    //landingLight3.draw();
     
     ofPopMatrix();
 

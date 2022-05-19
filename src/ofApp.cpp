@@ -7,16 +7,12 @@
 //
 //
 //  Student Name: Alan Park, Walton Ma
-//  Date date: May 18, 2022
+//  Date: May 18, 2022
 
 
 #include "ofApp.h"
 #include "Util.h"
 
-
-//--------------------------------------------------------------
-// setup scene, lighting, state and load geometry
-//
 void ofApp::setup() {
     bWireframe = false;
     bDisplayPoints = false;
@@ -26,8 +22,9 @@ void ofApp::setup() {
     bTerrainSelected = true;
     ofSetVerticalSync(true);
     
-    background.load("images/background.png");
+    background.load("images/background.png"); // starry background image
 
+    // Camera setup
     theCam = &easyCam;
     easyCam.setDistance(100);
     easyCam.setNearClip(0.1);
@@ -35,9 +32,8 @@ void ofApp::setup() {
     easyCam.setPosition(0, 300, 200);
     easyCam.lookAt(glm::vec3(0, 0, 0));
     easyCam.disableMouseInput();
-    
-    //trackCam.setPosition(glm::vec3(0, 75, 50));
-    trackCam.setPosition(glm::vec3(0, 51, 50)); // Set at lower position so its easier to see how close rocket is to ground
+
+    trackCam.setPosition(glm::vec3(0, 51, 50));
     trackCam.setNearClip(0.1);
     trackCam.setFov(65.5);
     
@@ -125,34 +121,22 @@ void ofApp::setup() {
     //  Setup terrain and lander models
     mars.loadModel("geo/PlanetTerrainMesaFinal.obj"); // custom terrain
     mars.setScaleNormalization(false);
-
-    //lander.loadModel("geo/lander.obj"); // Placeholder lander model
     lander.loadModel("geo/red_rocket.obj"); // Custom lander model
     lander.setScaleNormalization(false);
     lander.setPosition(0, 75, 0);
     bLanderLoaded = true;
 
     // create sliders for testing
-    //
     gui.setup();
     gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
-    
     bHide = false;
-
-    //  Create Octree for testing.
-    //
-
     mouseClickID = 0;
 
     uint64_t initialCreateTreeTime = ofGetElapsedTimeMillis();
-
     octree.create(mars.getMesh(0), 20);
-
     uint64_t finalCreateTreeTime = ofGetElapsedTimeMillis();
-
     cout << "Tree Create Time: " << finalCreateTreeTime - initialCreateTreeTime << " ms" << endl;
     cout << "Number of Verts: " << mars.getMesh(0).getNumVertices() << endl;
-
     testBox = Box(Vector3(3, 3, 0), Vector3(5, 5, 2));
     
     // Player particle for movement
@@ -165,8 +149,6 @@ void ofApp::setup() {
     playerParticleEmitter.setEmitterType(DirectionalEmitter);
     playerParticleEmitter.setPosition(ofVec3f(0, 100, 0));
     playerParticleEmitter.setLifespan(-1);
-    //playerParticleEmitter.start();
-    
     fuel = 100.0;
     altitude = lander.getPosition().y;
     
@@ -194,7 +176,7 @@ void ofApp::setup() {
     explosionEmitter.setLifespan(0.5);
     explosionEmitter.setParticleRadius(0.2);
     
-    
+    // Camera focus setup
     trackCam.lookAt(lander.getPosition());
     landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
     landerCam1.lookAt(glm::vec3(lander.getPosition().x, -lander.getPosition().y, lander.getPosition().z));
@@ -209,40 +191,33 @@ void ofApp::setup() {
 
     thrustSound.load("sounds/thrust.wav");
     thrustSound.setVolume(0.4);
-    
 }
 
-
-//--------------------------------------------------------------
-// incrementally update scene (animation)
-//
 void ofApp::update() {
     playerParticleEmitter.setPosition(ofVec3f(lander.getPosition().x, lander.getPosition().y, lander.getPosition().z));
 
-    if (bGameStart)
-    {
-        if (!playEmitterStarted)
-        {
+    if (bGameStart) { // Game Started
+        if (!playEmitterStarted) { // Only run once
             playerParticleEmitter.start();
             playEmitterStarted = true;
             radioSound.play();
         }
 
-        if (altitude <= 0) {
-            if (!completedLandingSequence) {
+        if (altitude <= 0) { // landed
+            if (!completedLandingSequence) { // Only run once
                 float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;
                 playerParticleEmitter.stop();
 
-                if (finalYVelocity < -4) {
+                if (finalYVelocity < -4) { // crash landing
                     explosionEmitter.sys->reset();
-                    explosionEmitter.start(); // debugging for now, will move for collision detection
+                    explosionEmitter.start();
                     landingType = 0; // crash
                     explosionSound.play();
                 }
-                else if (finalYVelocity < -2.5) {
+                else if (finalYVelocity < -2.5) { // hard landing
                     landingType = 1; // hard landing
                 }
-                else {
+                else { // good landing
                     landingType = 2; // good landing
                 }
                 completedLandingSequence = true;
@@ -267,18 +242,14 @@ void ofApp::update() {
             easyCam.lookAt(lander.getPosition());
         }
 
-        // TODO: check altitude with raycast
-
         ofVec3f pt;
         raySelectWithOctreeLander(pt);
         altitude = lander.getPosition().y - 5.4 - pt.y; // 5.4 for model height
 
         if (fuel > 0) {
-
             if (moveLeft || moveRight || moveForward || moveBackward || thrust || rotateLeft || rotateRight) {
                 fuel -= 0.05;
             }
-
             if (moveLeft) {
                 playerParticleEmitter.sys->particles.at(0).forces.x -= 7;
             }
@@ -299,14 +270,6 @@ void ofApp::update() {
             else {
                 rocketEmitter.stop();
             }
-            // TODO: rotate model
-            if (rotateLeft) {
-
-            }
-            if (rotateRight) {
-
-            }
-
         }
     }
     
@@ -314,7 +277,6 @@ void ofApp::update() {
     landerLight.setPosition(lander.getPosition().x, lander.getPosition().y + 6, lander.getPosition().z);
 }
 
-//--------------------------------------------------------------
 void ofApp::draw() {
     ofBackground(ofColor::black);
 
@@ -506,8 +468,7 @@ void ofApp::keyPressed(int key) {
                 easyCam.lookAt(p);
             }*/
 
-            if (bPointSelected)
-            {
+            if (bPointSelected) {
                 easyCam.lookAt(selectedPoint);
             }
 
@@ -670,15 +631,10 @@ void ofApp::keyReleased(int key) {
     }
 }
 
-
-
-//--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y) {
 
 }
 
-
-//--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button) {
 
     // if moving camera, don't allow mouse interaction
@@ -746,14 +702,8 @@ bool ofApp::raySelectWithOctreeLander(ofVec3f &pointRet) {
     return pointSelected;
 }
 
-
-
-
-//--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button) {
-
     // if moving camera, don't allow mouse interaction
-    //
     if (easyCam.getMouseInputEnabled()) return;
 
     if (bInDrag) {
@@ -775,15 +725,6 @@ void ofApp::mouseDragged(int x, int y, int button) {
         colBoxList.clear();
         octree.intersect(bounds, octree.root, colBoxList);
 
-
-        /*if (bounds.overlap(testBox)) {
-            cout << "overlap" << endl;
-        }
-        else {
-            cout << "OK" << endl;
-        }*/
-
-
     }
     else {
         ofVec3f p;
@@ -791,45 +732,32 @@ void ofApp::mouseDragged(int x, int y, int button) {
     }
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button) {
     bInDrag = false;
 }
 
-
-
 // Set the camera to use the selected point as it's new target
-//
 void ofApp::setCameraTarget() {
 
 }
 
-
-//--------------------------------------------------------------
 void ofApp::mouseEntered(int x, int y) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::mouseExited(int x, int y) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
 
 }
 
-//--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg) {
 
 }
 
-
-
-//--------------------------------------------------------------
 // setup basic ambient lighting in GL  (for now, enable just 1 light)
-//
 void ofApp::initLightingAndMaterials() {
 
     static float ambient[] =
@@ -873,7 +801,6 @@ void ofApp::savePicture() {
 }
 
 //--------------------------------------------------------------
-//
 // support drag-and-drop of model (.obj) file loading.  when
 // model is dropped in viewport, place origin under cursor
 //

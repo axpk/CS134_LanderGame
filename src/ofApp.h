@@ -123,4 +123,9 @@ public:
     bool completedLandingSequence = false;
     bool playEmitterStarted = false;
     int landingType = -1;
+    
+    // SOUND
+    ofSoundPlayer explosionSound;
+    ofSoundPlayer radioSound;
+    ofSoundPlayer thrustSound;
 };

@@ -198,6 +198,18 @@ void ofApp::setup() {
     trackCam.lookAt(lander.getPosition());
     landerCam1.setPosition(glm::vec3(lander.getPosition().x, lander.getPosition().y + 1.5, lander.getPosition().z + 3.5));
     landerCam1.lookAt(glm::vec3(lander.getPosition().x, -lander.getPosition().y, lander.getPosition().z));
+    
+    // SOUNDS
+    explosionSound.load("sounds/explosion.mp3");
+    explosionSound.setVolume(0.4);
+    
+    radioSound.load("sounds/radio.ogg");
+    radioSound.setLoop(true);
+    radioSound.setVolume(0.35);
+
+    thrustSound.load("sounds/thrust.wav");
+    thrustSound.setVolume(0.4);
+    
 }
 
 
@@ -213,6 +225,7 @@ void ofApp::update() {
         {
             playerParticleEmitter.start();
             playEmitterStarted = true;
+            radioSound.play();
         }
 
         if (altitude <= 0) {
@@ -220,10 +233,11 @@ void ofApp::update() {
                 float finalYVelocity = playerParticleEmitter.sys->particles.at(0).velocity.y;
                 playerParticleEmitter.stop();
 
-                if (finalYVelocity < -5) {
+                if (finalYVelocity < -4) {
                     explosionEmitter.sys->reset();
                     explosionEmitter.start(); // debugging for now, will move for collision detection
                     landingType = 0; // crash
+                    explosionSound.play();
                 }
                 else if (finalYVelocity < -2.5) {
                     landingType = 1; // hard landing
@@ -435,12 +449,15 @@ void ofApp::draw() {
             if (completedLandingSequence) {
                 if (landingType == 0) {
                     ofDrawBitmapString("Altitude: CRASHED", ofGetWindowWidth() - 200, 50);
+                    ofDrawBitmapString("CRASH LANDED - FAIL!", ofGetWindowWidth() / 2 - 60, ofGetWindowHeight() / 2);
                 }
                 else if (landingType == 1) {
                     ofDrawBitmapString("Altitude: HARD LANDING", ofGetWindowWidth() - 200, 50);
+                    ofDrawBitmapString("HARD LANDING - SUCCESS!", ofGetWindowWidth() / 2 - 60, ofGetWindowHeight() / 2);
                 }
                 else if (landingType == 2) {
                     ofDrawBitmapString("Altitude: GOOD LAND!", ofGetWindowWidth() - 200, 50);
+                    ofDrawBitmapString("GREAT LANDING - SUCCESS!", ofGetWindowWidth() / 2 - 60, ofGetWindowHeight() / 2);
                 }
             }
             else {
@@ -575,7 +592,11 @@ void ofApp::keyPressed(int key) {
             moveBackward = true;
             break;
         case ' ':
-            thrust = true;
+            if (!completedLandingSequence && fuel > 0) {
+                thrust = true;
+                thrustSound.play();
+            }
+            
             break;
         case 'z':
             rotateLeft = true;
@@ -635,6 +656,7 @@ void ofApp::keyReleased(int key) {
             break;
         case ' ':
             thrust = false;
+            thrustSound.stop();
             break;
         case 'z':
             rotateLeft = false;
